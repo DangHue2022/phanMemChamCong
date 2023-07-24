@@ -1,0 +1,41 @@
+{
+  "name": "phanmemchamcong",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --inspect src/server.js "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DangHue2022/phanMemChamCong.git"
+  },
+  "keywords": [
+    "payroll"
+  ],
+  "author": "dinh dang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DangHue2022/phanMemChamCong/issues"
+  },
+  "homepage": "https://github.com/DangHue2022/phanMemChamCong#readme",
+  "dependencies": {
+    "app-root-path": "^3.1.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cron": "^2.3.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.0.7",
+    "glob": "^10.3.3",
+    "jsonwebtoken": "^9.0.1",
+    "pg": "^8.11.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.32.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "sequelize-cli": "^6.6.1"
+  }
+}

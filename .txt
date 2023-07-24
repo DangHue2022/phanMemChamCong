@@ -1,0 +1,34 @@
+USER:
+get(/users/register);  // đăng ký nhân viên mới
+post(/users/register);
+
+get(/users/profile); // xem thông tin cá nhân
+
+get(/users/edit);      // chỉnh sửa nhân viên
+post(/users/edit);
+
+get(/users/createFrom);  // tạo đơn xin nghỉ, xin đến muộn,...
+post(/users/sendFrom);   // gửi đơn xin nghỉ, xin đến muộn,...
+get(/users/notification);// thông báo;
+
+get(/users/check);     // checkin và checkout
+
+get(/users/timekeeping-calendar)  // xem lịch chấm công theo tháng
+
+get(/users/notification-detail)   // xem chi tiết thông báo đơn xin nghỉ
+
+ADMIN:
+get(/admin/listUser);   // liệt kê danh sách nhân viên
+
+get(/admin/user);       // chỉnh sửa nhân viên
+post(/admin/user);
+
+patch(/admin/deleteUser);   // xóa mềm nhân viên
+
+get(/admin/listFrom);   // danh sách đơn xin nghỉ phép của nhân viên
+    get(admin/listFrom/detail); // chi tiết đơn xin nghỉ phép
+    post(admin/listFrom/accept);// chấp nhận đơn nghỉ
+    post(admin/listFrom/reject);// từ chối đơn nghỉ
+
+get(/admin/settings)    // thiết đặt các thông số
+post(admin/settings)
