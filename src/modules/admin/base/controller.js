@@ -47,9 +47,8 @@ class controlerBaseAdmin {
     async editUser (req, res) {
         const dataUser = {
             salary: req.body.salary,
-            id: req.body.id,
         };
-        await serviceAdmin.update(dataUser, 'users');
+        await serviceAdmin.update(dataUser, {where: {id: req.body.id}}, 'users');
         return res.send('edit user confirm');
     }
 
@@ -57,9 +56,8 @@ class controlerBaseAdmin {
     async deleteUser (req, res) {
         const dataDelete = {
             deleted: true,
-            id: req.body.id,
         }
-        await serviceAdmin.update(dataDelete, 'users');
+        await serviceAdmin.update(dataDelete, {where: {id: req.body.id}}, 'users');
         return res.send('delete user confirm');
     }
 
@@ -70,20 +68,22 @@ class controlerBaseAdmin {
 
     async postSettings(req, res) {
         const dataSettings = {
+            day: req.body.dayOff,
             month: req.body.month,
             year: req.body.year,
             keys: ['number of hours worked in a day', 'saturday_off', 'sunday_off'],
             values: [req.body.hour_of_day, req.body.saturday_off, req.body.sunday_off],
         };
-        const month = await serviceAdmin.findOne({attributes: ['id'], where: {month: dataSettings.month, year: dataSettings.year}}, 'settings');
+        const month = await serviceAdmin.findOne({attributes: ['id', 'month'], where: {month: dataSettings.month, year: dataSettings.year}}, 'settings');
         if (month) {
-            dataSettings.id = month.id;
-            await serviceAdmin.update(dataSettings, 'settings');
+            await serviceAdmin.update(dataSettings, {where: {id: month.id}}, 'settings');
+            await serviceAdmin.update(dataSettings, {where: {month: month.month}}, 'holidays')
         }
         else {
             await serviceAdmin.create(dataSettings, 'settings');
+            await serviceAdmin.create(dataSettings, 'holidays');
         }
-        res.send(month);
+        res.send('month');
     }
 }
 

@@ -21,9 +21,8 @@ class defaultController {
             res.cookie('refreshToken', refreshToken, { maxAge: 6000000});
             const userUpdate = {
                 refreshToken: refreshToken,
-                id: req.user.id,
             };
-            await servicesAdmin.update(userUpdate, 'users');
+            await servicesAdmin.update(userUpdate, {where: {id: req.user.id}}, 'users');
             const user = await servicesAdmin.findOne({where: {email: req.user.email}}, 'users');
             res.cookie('user', user, { maxAge: 6000000});
 
@@ -61,9 +60,8 @@ class defaultController {
         res.clearCookie('user');
         const data = {
             refreshToken: '',
-            id: req.cookies.user.id
         }
-        await servicesAdmin.update(data, 'users');
+        await servicesAdmin.update(data, {where: {id: req.cookies.user.id}}, 'users');
         res.clearCookie('refreshToken');
         return res.redirect('/login');
     }

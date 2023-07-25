@@ -3,7 +3,7 @@ const db = require('../../models/index');
 
 const models = [
     'users', 'settings', 'timeSheets', 'singleTypes', 'payRoll', 
-    'notifications', 'leaveInformations', 'holiday', 'applicationForm'
+    'notifications', 'leaveInformations', 'holidays', 'applicationForm'
 ];
 
 class servicesDefault {
@@ -52,12 +52,12 @@ class servicesDefault {
         })
     }
 
-    update (data, mod) {
+    update (data, condition, mod) {
         return new Promise((resolve, reject) => {
             try {
                 models.forEach(async(model) => {
                     if(model === mod) {
-                        await db[model].update(data, {where: {id: data.id}});
+                        await db[model].update(data, condition);
                         resolve();
                     }
                 })
