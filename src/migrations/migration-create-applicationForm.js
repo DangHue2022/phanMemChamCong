@@ -32,13 +32,13 @@ module.exports = {
         },
       },
       date: {
-        type: Sequelize.DATEONLY
+        type: Sequelize.STRING
       },
       startTime: {
-        type: Sequelize.TIME
+        type: Sequelize.STRING
       },
       endTime: {
-        type: Sequelize.TIME
+        type: Sequelize.STRING
       },
       status: {
         allowNull: false,

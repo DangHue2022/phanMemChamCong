@@ -16,9 +16,9 @@ module.exports = (sequelize, DataTypes) => {
   applicationForm.init({
     userID: DataTypes.INTEGER,
     singleID: DataTypes.INTEGER,
-    date: DataTypes.DATEONLY,
-    startTime: DataTypes.TIME,
-    endTime: DataTypes.TIME,
+    date: DataTypes.STRING,
+    startTime: DataTypes.STRING,
+    endTime: DataTypes.STRING,
     status: DataTypes.INTEGER,
   }, {
     sequelize,

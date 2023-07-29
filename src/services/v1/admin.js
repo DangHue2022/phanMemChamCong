@@ -2,8 +2,8 @@ const { Op } = require('sequelize');
 const db = require('../../models/index');
 
 const models = [
-    'users', 'settings', 'timeSheets', 'singleTypes', 'payRoll', 
-    'notifications', 'leaveInformations', 'holidays', 'applicationForm'
+    'users', 'settings', 'timeSheets', 'singleTypes', 'payRolls', 
+    'notifications', 'leaveInformations', 'holidays', 'applicationForms'
 ];
 
 class servicesDefault {

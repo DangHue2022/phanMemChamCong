@@ -27,7 +27,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       workDay: {
-        type: Sequelize.STRING
+        type: Sequelize.FLOAT
       },
       salary: {
         type: Sequelize.INTEGER

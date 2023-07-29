@@ -1,4 +1,3 @@
-const validate = require('./validate');
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "access-token-secret-example-hoangdangdev.com-green-cat-a@";
 const jwt = require('../../../ulti/jwt');
 

@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   timeSheets.init({
     userID: DataTypes.INTEGER,
-    time: DataTypes.TIME,
-    date: DataTypes.DATEONLY,
+    time: DataTypes.STRING,
+    date: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'timeSheets',
