@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     startTime: DataTypes.STRING,
     endTime: DataTypes.STRING,
     status: DataTypes.INTEGER,
+    totalDaysOff: DataTypes.FLOAT,
   }, {
     sequelize,
     modelName: 'applicationForms',

@@ -42,6 +42,7 @@ const workDay = async () => {
         const dataTimeSheets = await serviceAdmin.findAll({where: {date: date, userID: user.id}}, 'timeSheets');
         const payRollMonth = await serviceAdmin.findOne({where: {month: month, year: year, userID: user.id}}, 'payRolls');
         const setting = await serviceAdmin.findOne({where: {month: month, year: year}}, 'settings');
+        const leaveDay = await serviceAdmin.findOne({where: {userID: user.id, month: month, year: year, status: false}}, 'leaveInformations');
         const payRollDay = {
             userID: user.id,
             month: month,
@@ -56,10 +57,7 @@ const workDay = async () => {
             const singleType = await serviceAdmin.findOne({where: {userID: user.id, date: date, status: 1}}, 'applicationForms');
             
             if (!singleType) {
-                time = dataTimeSheets[dataTimeSheets.length - 1].time - dataTimeSheets[0].time;
-                const hours = Math.floor(time / 3600000);
-                const minutes = Math.floor((time % 3600000) / 60000) / 60;
-                time = hours + minutes;
+                time = defaultTime(dataTimeSheets);
             }
             else if (singleType.singleID === 3) {
                 const hoursCheckOut = convertTimeToHours(dataTimeSheets[0].time);
@@ -70,10 +68,42 @@ const workDay = async () => {
                 const hoursCheckIn = convertTimeToHours(dataTimeSheets[dataTimeSheets.length - 1].time);
                 const startTimeHour = sliceAndConvertTime(singleType.startTime);
                 time = hoursCheckIn - startTimeHour;
-                console.log(time)
             }
             else if (singleType.singleID === 1) {
-                time = setting.values[0];
+                if (singleType.totalDaysOff === 1) {
+                    if (leaveDay.leaveOfMonth >= 1) {
+                        time = setting.values[0];
+                        const leaveDayPlus = {
+                            leaveOfMonth: leaveDay.leaveOfMonth - 1,
+                            used: true,
+                        }
+                        await serviceAdmin.update(leaveDayPlus, {where: {userID: user.id, month: month, year: year}}, 'leaveInformations');
+                    }
+                    else if (leaveDay.leaveOfMonth === 0.5) {
+                        time = 6;
+                        const leaveDayPlus = {
+                            leaveOfMonth: 0,
+                            used: true,
+                        }
+                        await serviceAdmin.update(leaveDayPlus, { where: { userID: user.id, month: month, year: year } }, 'leaveInformations');
+                    }
+                    else {
+                        time = defaultTime(dataTimeSheets);
+                    }
+                }
+                else if (singleType.totalDaysOff === 0.5) {
+                    if (leaveDay.leaveOfMonth >= 0.5) {
+                        time = (setting.values[0] / 2) + defaultTime(dataTimeSheets);
+                        const leaveDayPlus = {
+                            leaveOfMonth: leaveDay.leaveOfMonth - 0.5,
+                            used: true,
+                        }
+                        await serviceAdmin.update(leaveDayPlus, { where: { userID: user.id, month: month, year: year } }, 'leaveInformations');
+                    }
+                    else {
+                        time = defaultTime(dataTimeSheets);
+                    }
+                }
             }
             else if (singleType.singleID === 4) {
                 const hourLate = convertTimeToHours(dataTimeSheets[0].time);
@@ -84,10 +114,7 @@ const workDay = async () => {
                     time = setting.values[0];
                 }
                 else {
-                    time = dataTimeSheets[dataTimeSheets.length - 1].time - dataTimeSheets[0].time;
-                    const hours = Math.floor(time / 3600000);
-                    const minutes = Math.floor((time % 3600000) / 60000) / 60;
-                    time = hours + minutes;
+                    time = defaultTime(dataTimeSheets);
                 }
             }
             
@@ -130,13 +157,60 @@ const workDay = async () => {
         else {
             const single = await serviceAdmin.findOne({where: {userID: user.id, date: date, status: 1, singleID: 1}}, 'applicationForms');
             if (single) {
-                if (payRollMonth) {
-                    payRollDay.workDay = payRollMonth.workDay + 1;
-                    return await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
+                if (single.totalDaysOff === 1) {
+                    if (leaveDay.leaveOfMonth >= 1) {
+                        if (payRollMonth) {
+                            payRollDay.workDay = payRollMonth.workDay + 1;
+                            await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
+                        }
+                        else {
+                            payRollDay.workDay = 1;
+                            await serviceAdmin.create(payRollDay, 'payRolls');
+                        }
+                        const leaveDayPlus = {
+                            leaveOfMonth: leaveDay.leaveOfMonth - 1,
+                            used: true,
+                        }
+                        return await serviceAdmin.update(leaveDayPlus, {where: {userID: user.id, month: month, year: year}}, 'leaveInformations');
+                    }
+                    else if (leaveDay.leaveOfMonth === 0.5) {
+                        if (payRollMonth) {
+                            payRollDay.workDay = payRollMonth.workDay + 0.5;
+                            await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
+                        }
+                        else {
+                            payRollDay.workDay = 0.5;
+                            await serviceAdmin.create(payRollDay, 'payRolls');
+                        }
+                        const leaveDayPlus = {
+                            leaveOfMonth: 0,
+                            used: true,
+                        }
+                        return await serviceAdmin.update(leaveDayPlus, { where: { userID: user.id, month: month, year: year } }, 'leaveInformations');
+                    }
+                    else {
+                        return
+                    }
                 }
                 else {
-                    payRollDay.workDay = 1;
-                    return await serviceAdmin.create(payRollDay, 'payRolls');
+                    if (leaveDay.leaveOfMonth >= 0.5) {
+                        if (payRollMonth) {
+                            payRollDay.workDay = payRollMonth.workDay + 0.5;
+                            await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
+                        }
+                        else {
+                            payRollDay.workDay = 0.5;
+                            await serviceAdmin.create(payRollDay, 'payRolls');
+                        }
+                        const leaveDayPlus = {
+                            leaveOfMonth: leaveDay.leaveOfMonth - 0.5,
+                            used: true,
+                        }
+                        return await serviceAdmin.update(leaveDayPlus, { where: { userID: user.id, month: month, year: year } }, 'leaveInformations');
+                    }
+                    else {
+                        return
+                    }
                 }
             }
             return
@@ -158,6 +232,13 @@ const sliceAndConvertTime = (time) => {
     return startTimeHour;
 }
 
+const defaultTime = (data) => {
+    const defaultTime = data[data.length - 1].time - data[0].time;
+    const hours = Math.floor(defaultTime / 3600000);
+    const minutes = Math.floor((defaultTime % 3600000) / 60000) / 60;
+    return hours + minutes;
+}
+
 const extraDaysOff = new CronJob(
     '2 2 2 1 * *',
     leaveOfMonth,
@@ -173,7 +254,7 @@ const leavePeriod = new CronJob(
 );
 
 const closeTheWorkingDays = new CronJob(
-    '2 2 23 * * *',
+    '* * * * * *',
     workDay,
     null,
     true,
