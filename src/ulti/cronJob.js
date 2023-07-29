@@ -31,20 +31,6 @@ const expiredLeaveDays = async () => {
     await serviceAdmin.update({status: false}, {where: {year: d.getFullYear() - 1}}, 'leaveInformations');
 }
 
-const extraDaysOff = new CronJob(
-    '2 2 2 1 * *',
-    leaveOfMonth,
-    null,
-    true,
-);
-
-const leavePeriod = new CronJob(
-    '2 2 2 1 0 *',
-    expiredLeaveDays,
-    null,
-    true,
-);
-
 const workDay = async () => {
     const day = d.getDate();
     const month = d.getMonth() + 1;
@@ -172,8 +158,22 @@ const sliceAndConvertTime = (time) => {
     return startTimeHour;
 }
 
+const extraDaysOff = new CronJob(
+    '2 2 2 1 * *',
+    leaveOfMonth,
+    null,
+    true,
+);
+
+const leavePeriod = new CronJob(
+    '2 2 2 1 0 *',
+    expiredLeaveDays,
+    null,
+    true,
+);
+
 const closeTheWorkingDays = new CronJob(
-    '* * * * * *',
+    '2 2 23 * * *',
     workDay,
     null,
     true,
