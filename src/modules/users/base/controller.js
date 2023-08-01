@@ -1,5 +1,7 @@
 const appRootPath = require('app-root-path');
 const serviceAdmin = require('../../../services/v1/admin');
+const {otp} = require('../../../ulti/otp');
+const sendOTPMail = require('../../../ulti/nodeMailer');
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
 const fs = require('fs');
@@ -75,6 +77,36 @@ class controllerBaseUser {
     async changePassword(req, res) {
         await serviceAdmin.update({passWord: bcrypt.hashSync(req.body.newPassWord, salt)}, {where: {id: req.cookies.user.id}}, 'users');
         res.redirect('/login');
+    }
+
+    // edit email
+    getEditEmail(req, res) {
+        res.send('open edit email');
+    }
+
+    editEmail(req, res) {
+        const secret = otp.generateUniqueSecret();
+        const otpToken = otp.generateOTPToken(secret);
+        res.cookie('secret', secret, {maxAge: 6000000});
+        const sendOTP = {
+            otpToken: otpToken,
+            email: req.body.email
+        };
+        sendOTPMail(sendOTP);
+        res.send('open page OTP');
+    }
+
+    async checkOTP(req, res) {
+        try {
+            const checkOTP = otp.verifyOTPToken(req.body.otp, req.cookies.secret);
+            if (!checkOTP) {
+                return res.send('OTP wrong');
+            }
+            await serviceAdmin.update({email: req.body.email}, {where: {id: req.cookies.user.id}}, 'users');
+            return res.redirect('/login');
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 

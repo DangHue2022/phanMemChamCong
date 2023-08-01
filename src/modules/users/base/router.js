@@ -18,6 +18,13 @@ module.exports = {
         },
         {
             method: 'GET',
+            route: '/edit-email',
+            handler: [
+                controllerBaseUser.getEditEmail
+            ]
+        },
+        {
+            method: 'GET',
             route: '/change-password',
             handler: [
                 controllerBaseUser.getChangePassword
@@ -91,6 +98,20 @@ module.exports = {
             handler: [
                 validateUser.uploadImage,
                 controllerBaseUser.editAvatar
+            ]
+        },
+        {
+            method: 'POST',
+            route: '/edit-email',
+            handler: [
+                controllerBaseUser.editEmail
+            ]
+        },
+        {
+            method: 'POST',
+            route: '/check-otpEmail',
+            handler: [
+                controllerBaseUser.checkOTP
             ]
         }
     ]
