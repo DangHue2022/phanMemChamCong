@@ -254,7 +254,7 @@ const leavePeriod = new CronJob(
 );
 
 const closeTheWorkingDays = new CronJob(
-    '* * * * * *',
+    '2 2 23 * * *',
     workDay,
     null,
     true,

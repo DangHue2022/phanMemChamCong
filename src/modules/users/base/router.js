@@ -1,6 +1,6 @@
 const controllerBaseUser = require('./controller');
 const { check } = require('./middleware');
-const validate = require('./validate');
+const validateUser = require('./validate');
 
 module.exports = {
     baseUrl: '/users',
@@ -13,15 +13,14 @@ module.exports = {
             route: '/profile',
             handler: [
                 
-                controllerBaseUser.check
+                controllerBaseUser.profile
             ]
         },
         {
             method: 'GET',
-            route: '/edit',
+            route: '/change-password',
             handler: [
-                
-                controllerBaseUser.check
+                controllerBaseUser.getChangePassword
             ]
         },
         {
@@ -65,25 +64,33 @@ module.exports = {
         },
         {
             method: 'POST',
-            route: '/register',
-            handler: [
-                
-                controllerBaseUser.single
-            ]
-        },
-        {
-            method: 'POST',
             route: '/edit',
             handler: [
                 
-                controllerBaseUser.check
+                controllerBaseUser.edit
             ]
         },
         {
             method: 'POST',
             route: 'send-from',
             handler: [
-                controllerBaseUser.check
+                controllerBaseUser.sendForm
+            ]
+        },
+        {
+            method: 'POST',
+            route: '/change-password',
+            handler: [
+                validateUser.checkPassword,
+                controllerBaseUser.changePassword
+            ]
+        },
+        {
+            method: 'POST',
+            route: '/edit-avatar',
+            handler: [
+                validateUser.uploadImage,
+                controllerBaseUser.editAvatar
             ]
         }
     ]
