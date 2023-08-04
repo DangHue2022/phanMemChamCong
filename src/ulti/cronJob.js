@@ -45,6 +45,7 @@ const workDay = async () => {
         const leaveDay = await serviceAdmin.findOne({where: {userID: user.id, month: month, year: year, status: false}}, 'leaveInformations');
         const payRollDay = {
             userID: user.id,
+            day: day,
             month: month,
             year: year,
         };
@@ -117,41 +118,21 @@ const workDay = async () => {
                     time = defaultTime(dataTimeSheets);
                 }
             }
-            
-            if (payRollMonth) {
-                if (time >= 7.5 && time < setting.values[0]) {
-                    payRollDay.workDay = payRollMonth.workDay + 0.7;
-                    return await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
-                }
-                else if (time >= 5 && time < 7.5) {
-                    payRollDay.workDay = payRollMonth.workDay + 0.5;
-                    return await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
-                }
-                else if (time < 5) {
-                    return;
-                }
-                else {
-                    payRollDay.workDay = payRollMonth.workDay + 1;
-                    return await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
-                }
+            if (time >= 7.5 && time < setting.values[0]) {
+                payRollDay.workDay = 0.7;
+                return await serviceAdmin.create(payRollDay, 'payRolls');
+            }
+            else if (time >= 5 && time < 7.5) {
+                payRollDay.workDay = 0.5;
+                return await serviceAdmin.create(payRollDay, 'payRolls');
+            }
+            else if (time < 5) {
+                payRollDay.workDay = 0;
+                return await serviceAdmin.create(payRollDay, 'payRolls');
             }
             else {
-                if (time >= 7.5 && time < setting.values[0]) {
-                    payRollDay.workDay = 0.7;
-                    return await serviceAdmin.create(payRollDay, 'payRolls');
-                }
-                else if (time >= 5 && time < 7.5) {
-                    payRollDay.workDay = 0.5;
-                    return await serviceAdmin.create(payRollDay, 'payRolls');
-                }
-                else if (time < 5) {
-                    payRollDay.workDay = 0;
-                    return await serviceAdmin.create(payRollDay, 'payRolls');
-                }
-                else {
-                    payRollDay.workDay = 1;
-                    return await serviceAdmin.create(payRollDay, 'payRolls');
-                }
+                payRollDay.workDay = 1;
+                return await serviceAdmin.create(payRollDay, 'payRolls');
             }
         }
         else {
@@ -159,14 +140,8 @@ const workDay = async () => {
             if (single) {
                 if (single.totalDaysOff === 1) {
                     if (leaveDay.leaveOfMonth >= 1) {
-                        if (payRollMonth) {
-                            payRollDay.workDay = payRollMonth.workDay + 1;
-                            await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
-                        }
-                        else {
-                            payRollDay.workDay = 1;
-                            await serviceAdmin.create(payRollDay, 'payRolls');
-                        }
+                        payRollDay.workDay = 1;
+                        await serviceAdmin.create(payRollDay, 'payRolls');
                         const leaveDayPlus = {
                             leaveOfMonth: leaveDay.leaveOfMonth - 1,
                             used: true,
@@ -174,14 +149,8 @@ const workDay = async () => {
                         return await serviceAdmin.update(leaveDayPlus, {where: {userID: user.id, month: month, year: year}}, 'leaveInformations');
                     }
                     else if (leaveDay.leaveOfMonth === 0.5) {
-                        if (payRollMonth) {
-                            payRollDay.workDay = payRollMonth.workDay + 0.5;
-                            await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
-                        }
-                        else {
-                            payRollDay.workDay = 0.5;
-                            await serviceAdmin.create(payRollDay, 'payRolls');
-                        }
+                        payRollDay.workDay = 0.5;
+                        await serviceAdmin.create(payRollDay, 'payRolls');
                         const leaveDayPlus = {
                             leaveOfMonth: 0,
                             used: true,
@@ -194,14 +163,8 @@ const workDay = async () => {
                 }
                 else {
                     if (leaveDay.leaveOfMonth >= 0.5) {
-                        if (payRollMonth) {
-                            payRollDay.workDay = payRollMonth.workDay + 0.5;
-                            await serviceAdmin.update(payRollDay, {where: {month: payRollMonth.month, userID: payRollMonth.userID, year: payRollMonth.year}}, 'payRolls');
-                        }
-                        else {
-                            payRollDay.workDay = 0.5;
-                            await serviceAdmin.create(payRollDay, 'payRolls');
-                        }
+                        payRollDay.workDay = 0.5;
+                        await serviceAdmin.create(payRollDay, 'payRolls');
                         const leaveDayPlus = {
                             leaveOfMonth: leaveDay.leaveOfMonth - 0.5,
                             used: true,

@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   payRoll.init({
     userID: DataTypes.INTEGER,
+    day: DataTypes.INTEGER,
     month: DataTypes.INTEGER,
     year: DataTypes.INTEGER,
     workDay: DataTypes.FLOAT,

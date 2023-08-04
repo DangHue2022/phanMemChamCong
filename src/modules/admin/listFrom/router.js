@@ -1,35 +1,38 @@
-const controller = require('./controller');
-const { sleep } = require('./middleware');
-const validate = require('./validate');
+const controllerUserListForm = require('./controller');
+const { check } = require('./middleware');
 
 module.exports = {
-    baseUrl: '/admin/list-from',
+    baseUrl: '/admin/list-form',
     handler: [
-        sleep,
+        check,
     ],
     default: [
         {
             method: 'GET',
             route: '/detail',
             handler: [
-                validate,
-                controller
+                controllerUserListForm.detailForm
             ]
         },
         {
-            method: 'POST',
+            method: 'GET',
             route: '/accept',
             handler: [
-                validate,
-                controller
+                controllerUserListForm.acceptForm
+            ]
+        },
+        {
+            method: 'GET',
+            route: '/reject',
+            handler: [
+                controllerUserListForm.rejectForm
             ]
         },
         {
             method: 'POST',
-            route: '/reject',
+            route: '/',
             handler: [
-                validate,
-                controller
+                controllerUserListForm.listForm
             ]
         }
     ]
