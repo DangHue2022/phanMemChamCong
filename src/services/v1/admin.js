@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const db = require('../../models/index');
 
 const models = [
-    'users', 'settings', 'timeSheets', 'singleTypes', 'payRolls', 
+    'users', 'settings', 'timeSheets', 'singleTypes', 'payRolls', 'monthlySalarys',
     'notifications', 'leaveInformations', 'holidays', 'applicationForms'
 ];
 

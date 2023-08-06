@@ -1,4 +1,6 @@
+const { sequelize } = require('../models');
 const serviceAdmin = require('../services/v1/admin');
+const db = require('../models/index');
 const CronJob = require('cron').CronJob;
 const d = new Date();
 
@@ -40,7 +42,6 @@ const workDay = async () => {
     
     listUsers.forEach(async (user) => {
         const dataTimeSheets = await serviceAdmin.findAll({where: {date: date, userID: user.id}}, 'timeSheets');
-        const payRollMonth = await serviceAdmin.findOne({where: {month: month, year: year, userID: user.id}}, 'payRolls');
         const setting = await serviceAdmin.findOne({where: {month: month, year: year}}, 'settings');
         const leaveDay = await serviceAdmin.findOne({where: {userID: user.id, month: month, year: year, status: false}}, 'leaveInformations');
         const payRollDay = {
@@ -181,6 +182,64 @@ const workDay = async () => {
     })
 };
 
+const payRoll = async () => {
+    var getMonth = d.getMonth();
+    var getFullYear = d.getFullYear();
+    if (getMonth === 0) {
+        getMonth = 12;
+        getFullYear -= 1;
+    }
+    counterWeekend(getFullYear, getMonth - 1);
+    var sumDay = new Date(getFullYear, getMonth, 0).getDate();
+    const relaxForWeek = await serviceAdmin.findOne({where: {month: getMonth, year: getFullYear}}, 'settings');
+    var dayOfTheMonth = sumDay;
+    if (relaxForWeek) {
+        for (let i = 0; i < relaxForWeek.keys.length; i++) {
+            if (relaxForWeek.keys[i] === 'saturday_off') {
+                if (relaxForWeek.values[i] === 'true') {
+                    dayOfTheMonth = sumDay - counterSaturday;
+                    sumDay = dayOfTheMonth;
+                    continue;
+                }
+            }
+            else if (relaxForWeek.keys[i] === 'sunday_off') {
+                if (relaxForWeek.values[i] === 'true') {
+                    dayOfTheMonth = sumDay - counterSunday;
+                    sumDay = dayOfTheMonth;
+                    continue;
+                }
+            }
+        }
+    }
+
+    // tính tổng số ngày công trong tháng
+    const sumWorkDays = await serviceAdmin.findAll(
+        { attributes: ['userID', 'month', 'year', [sequelize.fn('SUM', sequelize.col('workDay')), 'sumWorkDay']
+    ], group: ['userID', 'month', 'year'], where: {month: getMonth, year: getFullYear}}, 'payRolls');
+    
+    // tính lương
+    const holiday = await serviceAdmin.findOne({where: {month: getMonth, year: getFullYear}}, 'holidays')
+    const users = await serviceAdmin.findAll({where: {role: 1, deleted: false}}, 'users');
+    users.forEach(async (user) => {
+        sumWorkDays.forEach(async (sumWorkDay) => {
+            if (user.id === sumWorkDay.dataValues.userID) {
+                if (holiday) {
+                    sumWorkDay.dataValues.sumWorkDay += holiday.day
+                }
+                const userSalary = (user.salary / dayOfTheMonth) * sumWorkDay.dataValues.sumWorkDay;
+                const monthlySalary = {
+                    userID: user.id,
+                    month: sumWorkDay.dataValues.month,
+                    year: getFullYear,
+                    workDay: sumWorkDay.dataValues.sumWorkDay,
+                    salary: userSalary,
+                }
+                await serviceAdmin.create(monthlySalary, 'monthlySalarys');
+            }
+        })
+    })
+}
+
 const convertTimeToHours = (milisecond) => {
     var hoursCheckIn = Math.floor(milisecond / 3600000);
     const minutesCheckIn = Math.floor((milisecond % 3600000) / 60000) / 60;
@@ -202,6 +261,25 @@ const defaultTime = (data) => {
     return hours + minutes;
 }
 
+var day, counterSaturday, counterSunday, date;
+function counterWeekend(year, month) {
+    day = 1;
+    counterSaturday = 0;
+    counterSunday = 0;
+    date = new Date(year, month, day);
+    while (date.getMonth() === month) {
+        if (date.getDay() === 6) { // Sun=0, Mon=1, Tue=2, etc.
+            counterSaturday += 1;
+        }
+        if (date.getDay() === 0) { // Sun=0, Mon=1, Tue=2, etc.
+            counterSunday += 1;
+        }
+        day += 1;
+        date = new Date(year, month, day);
+    }
+    return;
+};
+
 const extraDaysOff = new CronJob(
     '2 2 2 1 * *',
     leaveOfMonth,
@@ -219,6 +297,13 @@ const leavePeriod = new CronJob(
 const closeTheWorkingDays = new CronJob(
     '2 2 23 * * *',
     workDay,
+    null,
+    true,
+);
+
+const payRolls = new CronJob(
+    '2 2 2 1 * * ',
+    payRoll,
     null,
     true,
 );

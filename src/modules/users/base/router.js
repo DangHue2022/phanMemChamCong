@@ -12,7 +12,6 @@ module.exports = {
             method: 'GET',
             route: '/profile',
             handler: [
-                
                 controllerBaseUser.profile
             ]
         },
@@ -31,57 +30,10 @@ module.exports = {
             ]
         },
         {
-            method: 'GET',
-            route: '/create-from',
-            handler: [
-                
-                controllerBaseUser.createForm
-            ]
-        },
-        {
-            method: 'GET',
-            route: '/notifications',
-            handler: [
-                
-                controllerBaseUser.check
-            ]
-        },
-        {
-            method: 'GET',
-            route: '/check',
-            handler: [
-                controllerBaseUser.check
-            ]
-        },
-        {
-            method: 'GET',
-            route: '/timekeeping-calendar',
-            handler: [
-                
-                controllerBaseUser.check
-            ]
-        },
-        {
-            method: 'GET',
-            route: '/notifications-detail',
-            handler: [
-                
-                controllerBaseUser.check
-            ]
-        },
-        {
             method: 'POST',
             route: '/edit',
             handler: [
-                
                 controllerBaseUser.edit
-            ]
-        },
-        {
-            method: 'POST',
-            route: 'send-from',
-            handler: [
-                controllerBaseUser.sendForm
             ]
         },
         {
