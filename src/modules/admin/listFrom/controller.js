@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const servicesAdmin = require('../../../services/v1/admin');
+const db = require('../../../models/index');
 
 class controllerUserListForm {
     async listForm (req, res) {
@@ -15,18 +16,36 @@ class controllerUserListForm {
     }
 
     async detailForm (req, res) {
-        const detailForm = await servicesAdmin.findOne({where: {id: req.query.id}}, 'applicationForms');
-        res.send(detailForm);
+        servicesAdmin.innerJoin('singleTypes', 'applicationForms', {foreignKey: 'singleID', constraints: false})
+        const innerJoin = await servicesAdmin.findOne({include: [{model: db.singleTypes, required: true}], where: {id: req.query.id}}, 'applicationForms');
+        res.send(innerJoin);
     }
 
     async acceptForm (req, res) {
+        // applicationForms inner join singleTypes
         await servicesAdmin.update({status: 1},{where: {id: req.query.id}}, 'applicationForms');
-        res.redirect('back');
+        servicesAdmin.innerJoin('singleTypes', 'applicationForms', {foreignKey: 'singleID', constraints: false})
+        const innerJoin = await servicesAdmin.findOne({include: [{model: db.singleTypes, required: true}], where: {id: req.query.id}}, 'applicationForms');
+        const notification = {
+            userID: innerJoin.userID,
+            formID: req.query.id,
+            content: innerJoin.singleType.name + ' của bạn đã được phê duyệt', 
+        }
+        await servicesAdmin.create(notification, 'notifications');
+        res.send(innerJoin);
     }
 
     async rejectForm (req, res) {
-        await servicesAdmin.update({status: 2}, {id: req.query.id}, 'applicationForms');
-        res.redirect('back');
+        await servicesAdmin.update({status: 2}, {where:{id: req.query.id}}, 'applicationForms');
+        servicesAdmin.innerJoin('singleTypes', 'applicationForms', {foreignKey: 'singleID', constraints: false})
+        const innerJoin = await servicesAdmin.findOne({include: [{model: db.singleTypes, required: true}], where: {id: req.query.id}}, 'applicationForms');
+        const notification = {
+            userID: innerJoin.userID,
+            formID: req.query.id,
+            content: innerJoin.singleType.name + ' của bạn đã bị từ chối phê duyệt', 
+        }
+        await servicesAdmin.create(notification, 'notifications');
+        res.send(innerJoin);
     }
 }
 

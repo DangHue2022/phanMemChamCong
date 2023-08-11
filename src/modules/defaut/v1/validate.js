@@ -17,6 +17,36 @@ class validate {
             }
         }
     }
+
+    async checkPassword(req, res, next) { 
+        if (req.body.newPassword != req.body.enterThePassword) {
+            return res.status(403).send('re-enter incorrect password');
+        }
+        else {
+            var checkPasswordUpToCase = false;
+            var checkPasswordToLowerCase = false;
+            var checkPasswordNumber = false;
+            var checkPasswordSpecialCharacters = false;
+            for (let i = 0; i< req.body.newPassword.length; i++) {
+                if (req.body.newPassword[i] >= 'A' && req.body.newPassword[i] <= 'Z') {
+                    checkPasswordUpToCase = true;
+                }
+                else if (req.body.newPassword[i] >= 'a' && req.body.newPassword[i] <= 'z') {
+                    checkPasswordToLowerCase = true;
+                }
+                else if (req.body.newPassword[i] >= '0' && req.body.newPassword[i] <= '9') {
+                    checkPasswordNumber = true;
+                }
+                else if (req.body.newPassword[i] === '!' || req.body.newPassword[i] === '@' || req.body.newPassword[i] === '$' || req.body.newPassword[i] === '&' || req.body.newPassword === '%') {
+                    checkPasswordSpecialCharacters = true;
+                }
+            }
+            if (checkPasswordNumber === false || checkPasswordSpecialCharacters === false || checkPasswordToLowerCase === false || checkPasswordUpToCase === false) {
+                return res.status(403).send('Weak password')
+            }
+            next();
+        }
+    }
 }
 
 module.exports = new validate();

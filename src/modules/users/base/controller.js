@@ -1,11 +1,10 @@
 const appRootPath = require('app-root-path');
 const serviceAdmin = require('../../../services/v1/admin');
-const {otp} = require('../../../ulti/otp');
+const otp = require('../../../ulti/otp');
 const sendOTPMail = require('../../../ulti/nodeMailer');
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
 const fs = require('fs');
-const path = require('path');
 
 class controllerBaseUser {
     // edit user

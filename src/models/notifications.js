@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   notification.init({
+    userID: DataTypes.INTEGER,
     formID: DataTypes.STRING,
     content: DataTypes.TEXT,
   }, {

@@ -1,6 +1,9 @@
-const db = require ('../../../models/index');
 const jwt = require('../../../ulti/jwt');
 const servicesAdmin = require('../../../services/v1/admin');
+const otp = require('../../../ulti/otp');
+const nodeMailer = require('../../../ulti/nodeMailer');
+const bcrypt = require('bcryptjs');
+const salt = bcrypt.genSaltSync(10);
 require('dotenv').config();
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "access-token-secret-example-hoangdangdev.com-green-cat-a@";
 const accessTokenLife = process.env.ACCESS_TOKEN_LIFE || '1h';
@@ -64,6 +67,41 @@ class defaultController {
         await servicesAdmin.update(data, {where: {id: req.cookies.user.id}}, 'users');
         res.clearCookie('refreshToken');
         return res.redirect('/login');
+    }
+
+    // forgot password
+    getForgotPassword(req, res) {
+        res.send('open forgot password');
+    }
+
+    forgotPassWord(req, res) {
+        const secret = otp.generateUniqueSecret()
+        const OTP = otp.generateOTPToken(secret);
+        res.cookie('secret', secret, {maxAge: 6000000});
+        res.cookie('email', req.body.email, {maxAge: 6000000});
+        const sendOtp = {
+            email: req.body.email,
+            otpToken: OTP,
+        };
+        nodeMailer(sendOtp);
+        res.send('open email get OTP');
+    }
+
+    checkOtp(req, res) {
+        const checkOtp = otp.verifyOTPToken(req.body.otp, req.cookies.secret);
+        if (checkOtp) {
+            res.clearCookie('secret');
+            res.send('open reset password');
+        }
+        else {
+            res.send('otp wrong');
+        }
+    }
+
+    async resetPassword(req, res) {
+        const password = bcrypt.hashSync(req.body.newPassword, salt);
+        await servicesAdmin.update({password: password}, {where: {email: req.cookies.email}}, 'users');
+        res.redirect('/login');
     }
 
     home (req, res) {

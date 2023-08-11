@@ -40,6 +40,35 @@ module.exports = {
         },
         {
             method: 'GET',
+            route: '/forgot-password',
+            handler: [
+                defaultController.getForgotPassword
+            ]
+        },
+        {
+            method: 'POST',
+            route: '/forgot-password',
+            handler: [
+                defaultController.forgotPassWord
+            ]
+        },
+        {
+            method: 'POST',
+            route: '/check-OTP',
+            handler: [
+                defaultController.checkOtp
+            ]
+        },
+        {
+            method: 'POST',
+            route: '/reset-password',
+            handler: [
+                validateDefault.checkPassword,
+                defaultController.resetPassword
+            ]
+        },
+        {
+            method: 'GET',
             route: '',
             handler: [
                 defaultController.home

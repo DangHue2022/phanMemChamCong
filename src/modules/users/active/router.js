@@ -18,7 +18,14 @@ module.exports = {
             method: 'GET',
             route: '/notifications',
             handler: [
-                controllerBaseUser.check
+                controllerBaseUser.notification
+            ]
+        },
+        {
+            method: 'GET',
+            route: '/notifications-detail',
+            handler: [
+                controllerBaseUser.detailNotification
             ]
         },
         {
@@ -31,13 +38,6 @@ module.exports = {
         {
             method: 'GET',
             route: '/timekeeping-calendar',
-            handler: [
-                controllerBaseUser.check
-            ]
-        },
-        {
-            method: 'GET',
-            route: '/notifications-detail',
             handler: [
                 controllerBaseUser.check
             ]

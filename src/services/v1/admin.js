@@ -66,6 +66,18 @@ class servicesDefault {
             }
         });
     }
+
+    innerJoin (model, mod, foreignKey) {
+        return new Promise((resolve, reject) => {
+            try {
+                db[model].hasMany(db[mod],foreignKey);
+                db[mod].belongsTo(db[model], foreignKey);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        })
+    }
 }
 
 module.exports = new servicesDefault();

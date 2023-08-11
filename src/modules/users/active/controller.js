@@ -1,5 +1,5 @@
-
 const serviceAdmin = require('../../../services/v1/admin');
+const db = require('../../../models/index');
 
 class controllerBaseUser {
     async check(req, res) {
@@ -34,6 +34,18 @@ class controllerBaseUser {
         }
         await serviceAdmin.create(type, 'applicationForms');
         res.send('type')
+    }
+
+    // notifications
+    async notification(req, res) {
+        const dataNotification = await serviceAdmin.findAll({where: {userID: req.cookies.user.id}}, 'notifications');
+        res.send(dataNotification)
+    }
+
+    async detailNotification(req, res) {
+        serviceAdmin.innerJoin('singleTypes', 'applicationForms', {foreignKey: 'singleID', constraints: false})
+        const innerJoin = await serviceAdmin.findOne({include: [{model: db.singleTypes, required: true}], where: {id: req.query.formID}}, 'applicationForms');
+        res.send(innerJoin)
     }
 }
 

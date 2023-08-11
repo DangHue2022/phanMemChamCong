@@ -1,6 +1,3 @@
-require('dotenv').config();
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "access-token-secret-example-hoangdangdev.com-green-cat-a@";
-const jwt = require('../../../ulti/jwt');
 const serviceAdmin = require('../../../services/v1/admin');
 
 class validateBaseAdmin {

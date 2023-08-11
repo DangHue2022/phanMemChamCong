@@ -1,18 +1,25 @@
-const otplib = require('otplib');
-const {authenticator} = otplib;
+const speakeasy = require("speakeasy")
 
 const otp = {
     generateUniqueSecret: () => {
-        return authenticator.generateSecret()
+        return speakeasy.generateSecret({length: 20});
       },
 
     generateOTPToken: (secret) => {
-        return authenticator.generate(secret)
+        return speakeasy.totp({
+          secret: secret.base32,
+          encoding: 'base32'
+        });
       },
       
     verifyOTPToken: (token, secret) => {
-        return authenticator.check( token, secret )
+        return speakeasy.totp.verify({
+          secret: secret.base32,
+          encoding: 'base32',
+          token: token,
+          window: 6,
+        });
       }
 }
 
-module.exports = {otp};
+module.exports = otp;
