@@ -39,14 +39,14 @@ const workDay = async () => {
                 time = defaultTime(dataTimeSheets);
             }
             else if (singleType.singleID === 3) {
-                const hoursCheckOut = convertTimeToHours(dataTimeSheets[0].time);
+                const hoursCheckIn = convertTimeToHours(dataTimeSheets[0].time);
                 const endTimeHour = sliceAndConvertTime(singleType.endTime);
-                time = endTimeHour - hoursCheckOut;
+                time = endTimeHour - hoursCheckIn;
             }
             else if (singleType.singleID === 2) {
-                const hoursCheckIn = convertTimeToHours(dataTimeSheets[dataTimeSheets.length - 1].time);
+                const hoursCheckOut = convertTimeToHours(dataTimeSheets[dataTimeSheets.length - 1].time);
                 const startTimeHour = sliceAndConvertTime(singleType.startTime);
-                time = hoursCheckIn - startTimeHour;
+                time = hoursCheckOut - startTimeHour;
             }
             else if (singleType.singleID === 1) {
                 if (singleType.totalDaysOff === 1) {
@@ -72,7 +72,7 @@ const workDay = async () => {
                 }
                 else if (singleType.totalDaysOff === 0.5) {
                     if (leaveDay.leaveOfMonth >= 0.5) {
-                        time = (setting.values[0] / 2) + defaultTime(dataTimeSheets);
+                        time = 5 + defaultTime(dataTimeSheets);
                         const leaveDayPlus = {
                             leaveOfMonth: leaveDay.leaveOfMonth - 0.5,
                             used: true,
@@ -241,6 +241,7 @@ const payRollAndLeaveOfMonth = async () => {
 const sendInformation = async () => {
     var getMonth = d.getMonth();
     var getFullYear = d.getFullYear();
+    var html = '';
     if (getMonth === 0) {
         getMonth = 12;
         getFullYear -= 1;
@@ -269,9 +270,20 @@ const sendInformation = async () => {
                 dataPayRoll.push(payRoll);
             }
         })
-        nodemailer(user, dataLeaveOld, dataMonthSalary, dataPayRoll);
+
+        dataPayRoll.forEach(ele => {
+            html += `<tr>
+                        <td>${ele.userID}</td>
+                        <td>${ele.day}</td>
+                        <td>${ele.month}</td>
+                        <td>${ele.year}</td>
+                        <td>${ele.workDay}</td>
+                    </tr>`
+        })
+        nodemailer(user, dataLeaveOld, dataMonthSalary, html);
     })
 }
+
 
 // convert time to hours
 const convertTimeToHours = (milisecond) => {
@@ -339,3 +351,10 @@ const closeTheWorkingDays = new CronJob(
     null,
     true,
 );
+
+const sendInformationToGmail = new CronJob(
+    '2 2 9 1 * *',
+    sendInformation,
+    null,
+    true,
+)

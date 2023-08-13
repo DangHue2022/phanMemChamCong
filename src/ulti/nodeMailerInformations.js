@@ -87,13 +87,7 @@ const sendMail = async (user, leave, salary, payRolls) => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>${leave.userID}</td>
-                        <td>${leave.month}</td>
-                        <td>${leave.year}</td>
-                        <td>${leave.leaveOfMonth}</td>
-                        <td>${leave.status}</td>
-                    </tr>
+                    ${payRolls}
                 </tbody>
             </table>
             <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

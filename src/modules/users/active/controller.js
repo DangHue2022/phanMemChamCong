@@ -1,5 +1,6 @@
 const serviceAdmin = require('../../../services/v1/admin');
 const db = require('../../../models/index');
+const d = new Date();
 
 class controllerBaseUser {
     async check(req, res) {
@@ -47,6 +48,33 @@ class controllerBaseUser {
         const innerJoin = await serviceAdmin.findOne({include: [{model: db.singleTypes, required: true}], where: {id: req.query.formID}}, 'applicationForms');
         res.send(innerJoin)
     }
+
+    // timekeeping-calendar
+    async calendar(req, res) {
+        const calendarWorkDay = await serviceAdmin.findAll({where: {userID: req.cookies.user.id, month: req.query.month}}, 'payRolls');
+        res.send(calendarWorkDay)
+    }
+
+    async historyCheckInOut(req, res) {
+        const userID = req.cookies.user.id;
+        const date = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+        var timeCheck = [];
+        const historyCheckInOutUser = await serviceAdmin.findAll({attributes: ['time'] ,where: {userID: userID, date: date}}, 'timeSheets');
+        historyCheckInOutUser.forEach(element => {
+            timeCheck.push( convertTimeToHours(element.time))
+        })
+        res.send(timeCheck)
+    }
+}
+
+const convertTimeToHours = (milisecond) => {
+    var hours = Math.floor(milisecond / 3600000);
+    const minutes = Math.floor((milisecond % 3600000) / 60000);
+    var time;
+    hours %= 24;
+    hours += 7;
+    time = hours + ':' + minutes;
+    return time
 }
 
 module.exports = new controllerBaseUser();

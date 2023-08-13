@@ -39,7 +39,14 @@ module.exports = {
             method: 'GET',
             route: '/timekeeping-calendar',
             handler: [
-                controllerBaseUser.check
+                controllerBaseUser.calendar
+            ]
+        },
+        {
+            method: 'GET',
+            route: '/history-checkin',
+            handler: [
+                controllerBaseUser.historyCheckInOut
             ]
         },
         {
